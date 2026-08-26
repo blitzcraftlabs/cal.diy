@@ -7,7 +7,7 @@ import { Badge } from "./Badge";
 
 export const CreditsBadge = function CreditsBadge({
   teamId,
-  isOrganization = false,
+  isOrganization: _isOrganization = false,
 }: {
   teamId?: number;
   isOrganization?: boolean;
@@ -15,8 +15,8 @@ export const CreditsBadge = function CreditsBadge({
   const { t } = useLocale();
 
   const getBillingPath = () => {
-    if (!teamId) return "/settings/billing";
-    return isOrganization ? "/settings/organizations/billing" : `/settings/teams/${teamId}/billing`;
+    if (!teamId) return "/settings/my-account/profile";
+    return `/settings/teams/${teamId}/billing`;
   };
 
   return (

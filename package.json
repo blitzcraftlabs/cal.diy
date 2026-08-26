@@ -11,8 +11,7 @@
     "packages/app-store",
     "packages/app-store/*",
     "packages/platform/*",
-    "packages/platform/examples/base",
-    "example-apps/*"
+    "packages/platform/examples/base"
   ],
   "scripts": {
     "app-store-cli": "yarn workspace @calcom/app-store-cli",
