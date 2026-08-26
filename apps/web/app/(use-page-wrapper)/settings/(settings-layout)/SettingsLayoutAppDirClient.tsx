@@ -2,7 +2,7 @@
 
 import { HAS_ORG_OPT_IN_FEATURES } from "@calcom/features/feature-opt-in/config";
 import type { TeamFeatures } from "@calcom/features/flags/config";
-import { IS_CALCOM, WEBAPP_URL } from "@calcom/lib/constants";
+import { WEBAPP_URL } from "@calcom/lib/constants";
 import { getPlaceholderAvatar } from "@calcom/lib/defaultAvatarImage";
 import { getUserAvatarUrl } from "@calcom/lib/getAvatarUrl";
 import { useIsStandalone } from "@calcom/lib/hooks/useIsStandalone";
@@ -160,21 +160,6 @@ const getTabs = (
           href: "/settings/organizations/privacy",
           trackingMetadata: { section: "organization", page: "privacy_and_security" },
         },
-        {
-          name: "SSO",
-          href: "/settings/organizations/sso",
-          trackingMetadata: { section: "organization", page: "sso" },
-        },
-        {
-          name: "directory_sync",
-          href: "/settings/organizations/dsync",
-          trackingMetadata: { section: "organization", page: "directory_sync" },
-        },
-        {
-          name: "api_docs",
-          href: "/docs",
-          trackingMetadata: { section: "organization", page: "api_docs" },
-        },
         ...(HAS_ORG_OPT_IN_FEATURES
           ? [
               {
@@ -231,35 +216,13 @@ const getTabs = (
     },
   ];
 
-  for (const tab of tabs) {
-    if (tab.name === "admin" && IS_CALCOM) {
-      tab.children?.push({
-        name: "create_org",
-        href: "/settings/organizations/new",
-        trackingMetadata: { section: "admin", page: "create_org" },
-      });
-
-      tab.children?.push({
-        name: "create_license_key",
-        href: "/settings/license-key/new",
-        trackingMetadata: { section: "admin", page: "create_license_key" },
-      });
-    }
-  }
-
   return tabs;
 };
 
 // The following keys are assigned to admin only
 const adminRequiredKeys = ["admin"];
 const organizationRequiredKeys = ["organization"];
-const organizationAdminKeys = [
-  "privacy",
-  "privacy_and_security",
-  "SSO",
-  "directory_sync",
-  "delegation_credential",
-];
+const organizationAdminKeys = ["privacy", "privacy_and_security"];
 
 interface SettingsPermissions {
   canViewRoles?: boolean;
@@ -267,15 +230,7 @@ interface SettingsPermissions {
   canUpdateOrganization?: boolean;
 }
 
-const useTabs = ({
-  isDelegationCredentialEnabled,
-  isPbacEnabled,
-  permissions,
-}: {
-  isDelegationCredentialEnabled: boolean;
-  isPbacEnabled: boolean;
-  permissions?: SettingsPermissions;
-}) => {
+const useTabs = ({ permissions }: { permissions?: SettingsPermissions }) => {
   const session = useSession();
   const { data: user } = trpc.viewer.me.get.useQuery({ includePasswordAdded: true });
   const orgBranding = null as { id?: number; slug?: string; name?: string; logoUrl?: string | null } | null;
@@ -294,51 +249,6 @@ const useTabs = ({
         const newArray = (tab?.children ?? []).filter(
           (child) => permissions?.canUpdateOrganization || !organizationAdminKeys.includes(child.name)
         );
-
-        // Add delegation-credential menu item only if feature flag is enabled
-        if (isDelegationCredentialEnabled) {
-          newArray.push({
-            name: "delegation_credential",
-            href: "/settings/organizations/delegation-credential",
-            trackingMetadata: { section: "organization", page: "delegation_credential" },
-          });
-        }
-
-        // Add pbac menu item - show opt-in page if not enabled, regular page if enabled
-        if (isPbacEnabled) {
-          if (permissions?.canViewRoles) {
-            newArray.push({
-              name: "roles_and_permissions",
-              href: "/settings/organizations/roles",
-              trackingMetadata: { section: "organization", page: "roles_and_permissions" },
-            });
-          }
-
-          if (permissions?.canViewOrganizationBilling) {
-            newArray.push({
-              name: "billing",
-              href: "/settings/organizations/billing",
-              trackingMetadata: { section: "organization", page: "billing" },
-            });
-          }
-        } else {
-          if (permissions?.canUpdateOrganization) {
-            newArray.push({
-              name: "billing",
-              href: "/settings/organizations/billing",
-              trackingMetadata: { section: "organization", page: "billing" },
-            });
-          }
-          // Show roles page (modal will appear if PBAC not enabled)
-          if (permissions?.canUpdateOrganization) {
-            newArray.push({
-              name: "roles",
-              href: "/settings/organizations/roles",
-              isBadged: true, // Show "New" badge,
-              trackingMetadata: { section: "organization", page: "roles" },
-            });
-          }
-        }
 
         return {
           ...tab,
@@ -373,7 +283,7 @@ const useTabs = ({
       if (isAdmin) return true;
       return !adminRequiredKeys.includes(tab.name);
     });
-  }, [isAdmin, orgBranding, user, isDelegationCredentialEnabled, isPbacEnabled, permissions]);
+  }, [isAdmin, orgBranding, user, permissions]);
 
   return processTabsMemod;
 };
@@ -410,8 +320,6 @@ const SettingsSidebarContainer = ({
   const { t } = useLocale();
 
   const tabsWithPermissions = useTabs({
-    isDelegationCredentialEnabled: false,
-    isPbacEnabled: false,
     permissions,
   });
 
