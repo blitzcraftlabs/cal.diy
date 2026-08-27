@@ -2445,7 +2445,7 @@ __metadata:
     "@calcom/trpc": "workspace:*"
     "@calcom/ui": "workspace:*"
     bcryptjs: "npm:2.4.3"
-    dub: "npm:0.59.1"
+    dub: "npm:0.61.14"
     handlebars: "npm:4.7.9"
     jose: "npm:4.15.9"
     lru-cache: "npm:9.0.3"
@@ -22372,18 +22372,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dub@npm:0.59.1":
-  version: 0.59.1
-  resolution: "dub@npm:0.59.1"
+"dub@npm:0.61.14":
+  version: 0.61.14
+  resolution: "dub@npm:0.61.14"
   peerDependencies:
-    "@modelcontextprotocol/sdk": ^1.5.0
+    "@modelcontextprotocol/sdk": ">=1.5.0 <1.10.0"
     zod: ">= 3"
   peerDependenciesMeta:
     "@modelcontextprotocol/sdk":
       optional: true
   bin:
     mcp: bin/mcp-server.js
-  checksum: 10/e19663e6c40ff38073ba2378a0b9c3165ee5cdc7729ec4a2dc0e1b2ef4348b15f2e653bca48c635b3085fb79c7260b1a7171e742e4145b65217170095ea633fa
+  checksum: 10/8db3d81365a8ed7c0183bced62cae773efcd78c544a28498e9e0db1135408caffcd57ed38ea20f156e8c50f2afc3122346ad731bb58ff1dcf5c93354df6ed263
   languageName: node
   linkType: hard
 

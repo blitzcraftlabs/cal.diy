@@ -485,9 +485,7 @@ export default function Success(props: PageProps) {
           </Link>
         </div>
       )}
-      <BookingPageTagManager
-        eventType={{ ...eventType, metadata: eventTypeMetaDataSchemaWithTypedApps.parse(eventType.metadata) }}
-      />
+      <BookingPageTagManager />
       <main className={classNames(shouldAlignCentrally ? "mx-auto" : "", isEmbed ? "" : "max-w-3xl")}>
         <div className={classNames("overflow-y-auto", isEmbed ? "" : "z-50 ")}>
           <div
