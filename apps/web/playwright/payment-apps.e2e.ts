@@ -265,7 +265,9 @@ test.describe("Payment app", () => {
 
     await goToAppsTab(page, paymentEvent?.id);
 
-    await page.locator("#event-type-form").getByRole("switch").click();
+    const giphySwitch = page.getByTestId("giphy-app-switch");
+    await giphySwitch.click();
+    await expect(page.locator("text=This app has not been setup yet")).toHaveCount(0);
     await page.getByTestId("update-eventtype").click();
   });
 

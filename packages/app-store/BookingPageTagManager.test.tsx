@@ -1,7 +1,23 @@
 import { vi } from "vitest";
 
+const { sdkActionManagerOn } = vi.hoisted(() => ({
+  sdkActionManagerOn: vi.fn(),
+}));
+
+vi.mock("@calcom/lib/sdk-event", () => ({
+  sdkActionManager: {
+    on: sdkActionManagerOn,
+  },
+}));
+
 import { handleEvent } from "./BookingPageTagManager";
 import { appStoreMetadata } from "./apps.metadata.generated";
+
+describe("BookingPageTagManager module registration", () => {
+  it("should register the wildcard SDK listener at import time", () => {
+    expect(sdkActionManagerOn).toHaveBeenCalledWith("*", handleEvent);
+  });
+});
 
 const REMOVED_ANALYTICS_APPS = [
   "ga4",

@@ -20,6 +20,9 @@ const tasks: Record<TaskTypes, () => Promise<TaskHandler>> = {
     import("./sendAwaitingPaymentEmail").then((module) => module.sendAwaitingPaymentEmail),
   bookingAudit: () => import("./bookingAudit").then((module) => module.bookingAudit),
   webhookDelivery: () => import("./webhookDelivery").then((module) => module.webhookDelivery),
+  // Legacy tombstone: drains pre-Phase-3 persisted tasks after analytics integrations were removed.
+  sendAnalyticsEvent: () =>
+    import("./sendAnalyticsEvent").then((module) => module.sendAnalyticsEvent),
 };
 
 export const tasksConfig = {
