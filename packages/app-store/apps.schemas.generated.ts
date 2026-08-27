@@ -46,7 +46,6 @@ import { appDataSchema as twipla_zod_ts } from "./twipla/zod";
 import { appDataSchema as umami_zod_ts } from "./umami/zod";
 import { appDataSchema as vital_zod_ts } from "./vital/zod";
 import { appDataSchema as webex_zod_ts } from "./webex/zod";
-import { appDataSchema as wordpress_zod_ts } from "./wordpress/zod";
 import { appDataSchema as zapier_zod_ts } from "./zapier/zod";
 import { appDataSchema as zoho_bigin_zod_ts } from "./zoho-bigin/zod";
 import { appDataSchema as zohocalendar_zod_ts } from "./zohocalendar/zod";
@@ -97,7 +96,6 @@ export const appDataSchemas = {
   umami: umami_zod_ts,
   vital: vital_zod_ts,
   webex: webex_zod_ts,
-  wordpress: wordpress_zod_ts,
   zapier: zapier_zod_ts,
   "zoho-bigin": zoho_bigin_zod_ts,
   zohocalendar: zohocalendar_zod_ts,
