@@ -167,12 +167,12 @@ Repository was ready for **Phase 3 — analytics and marketing integration purge
 
 ## Phase 3 metrics (analytics/marketing app-store purge)
 
-Measured 2026-08-27 from clean Git revisions via detached worktrees at base `e4fc69994b4b7e47fe47164cc6b47e5689c257f6` (Phase 2 corrective HEAD) and head `2092911db90ea7ec15857681cec48665a904d85d` (Phase 3 PR final head). Commands run identically in each worktree root; no dirty working-tree files included.
+Measured 2026-08-27 from clean Git revisions via detached worktrees at base `e4fc69994b4b7e47fe47164cc6b47e5689c257f6` (Phase 2 corrective HEAD) and head `6a30a58c418a83d35e4c268e174404acd8ea5163` (Phase 3 PR final head). Commands run identically in each worktree root; no dirty working-tree files included.
 
 ```bash
 # Create clean worktrees
 git worktree add /tmp/cal-decomp-metrics-phase3/base e4fc69994b4b7e47fe47164cc6b47e5689c257f6
-git worktree add /tmp/cal-decomp-metrics-phase3/head 2092911db90ea7ec15857681cec48665a904d85d
+git worktree add /tmp/cal-decomp-metrics-phase3/head 6a30a58c418a83d35e4c268e174404acd8ea5163
 
 # Run in each worktree root:
 yarn workspaces list | wc -l
@@ -243,7 +243,7 @@ Each provided customer-configured booking-page script injection (`appData.tag`) 
 
 ## Validation (Phase 3)
 
-Measured 2026-08-27 (final corrective pass at head `2092911db90ea7ec15857681cec48665a904d85d`).
+Measured 2026-08-27 (final corrective pass at head `6a30a58c418a83d35e4c268e174404acd8ea5163`).
 
 ```bash
 yarn app-store:build  # exit 0
