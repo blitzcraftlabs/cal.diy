@@ -2453,15 +2453,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@calcom/famulor@workspace:packages/app-store/famulor":
-  version: 0.0.0-use.local
-  resolution: "@calcom/famulor@workspace:packages/app-store/famulor"
-  dependencies:
-    "@calcom/lib": "workspace:*"
-    "@calcom/types": "workspace:*"
-  languageName: unknown
-  linkType: soft
-
 "@calcom/fathom@workspace:packages/app-store/fathom":
   version: 0.0.0-use.local
   resolution: "@calcom/fathom@workspace:packages/app-store/fathom"
@@ -2740,15 +2731,6 @@ __metadata:
     tslog: "npm:4.9.2"
     typescript: "npm:5.9.3"
     uuid: "npm:8.3.2"
-  languageName: unknown
-  linkType: soft
-
-"@calcom/linear@workspace:packages/app-store/linear":
-  version: 0.0.0-use.local
-  resolution: "@calcom/linear@workspace:packages/app-store/linear"
-  dependencies:
-    "@calcom/lib": "workspace:*"
-    "@calcom/types": "workspace:*"
   languageName: unknown
   linkType: soft
 
