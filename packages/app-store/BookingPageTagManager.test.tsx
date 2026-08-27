@@ -2,6 +2,22 @@ import { render, screen, cleanup } from "@testing-library/react";
 import { vi } from "vitest";
 
 import BookingPageTagManager, { handleEvent } from "./BookingPageTagManager";
+import { appStoreMetadata } from "./apps.metadata.generated";
+
+const REMOVED_ANALYTICS_APPS = [
+  "ga4",
+  "gtm",
+  "fathom",
+  "plausible",
+  "posthog",
+  "metapixel",
+  "matomo",
+  "umami",
+  "databuddy",
+  "insihts",
+  "twipla",
+  "dub",
+] as const;
 
 // NOTE:  We don't intentionally mock appStoreMetadata as that also tests config.json and generated files for us for no cost. If it becomes a pain in future, we could just start mocking it.
 
@@ -31,50 +47,25 @@ afterEach(() => {
 });
 
 describe("BookingPageTagManager", () => {
-  it("GTM App when enabled should have its scripts added with appropriate trackingID and $pushEvent replacement", () => {
-    const GTM_CONFIG = {
-      enabled: true,
-      trackingId: "GTM-123",
-    };
-    render(
-      <BookingPageTagManager
-        eventType={{
-          metadata: {
-            apps: {
-              gtm: GTM_CONFIG,
-            },
-          },
-          price: 0,
-          currency: "USD",
-        }}
-      />
-    );
-    const scripts = screen.getAllByTestId("cal-analytics-app-gtm");
-    const trackingScript = scripts[0];
-    const pushEventScript = scripts[1];
-    expect(trackingScript.innerHTML).toContain(GTM_CONFIG.trackingId);
-    expect(pushEventScript.innerHTML).toContain("cal_analytics_app__gtm");
+  it("should not include removed analytics integrations in app store metadata", () => {
+    for (const slug of REMOVED_ANALYTICS_APPS) {
+      expect(appStoreMetadata).not.toHaveProperty(slug);
+    }
   });
 
-  it("GTM App when disabled should not have its scripts added", () => {
-    const GTM_CONFIG = {
-      enabled: false,
-      trackingId: "GTM-123",
-    };
+  it("should not inject analytics scripts when event type has no analytics apps configured", () => {
     render(
       <BookingPageTagManager
         eventType={{
           metadata: {
-            apps: {
-              gtm: GTM_CONFIG,
-            },
+            apps: {},
           },
           price: 0,
           currency: "USD",
         }}
       />
     );
-    const scripts = screen.queryAllByTestId("cal-analytics-app-gtm");
+    const scripts = screen.queryAllByTestId(/^cal-analytics-app-/);
     expect(scripts.length).toBe(0);
   });
 
@@ -95,6 +86,28 @@ describe("BookingPageTagManager", () => {
       />
     );
     const scripts = screen.queryAllByTestId("cal-analytics-app-zoomvideo");
+    expect(scripts.length).toBe(0);
+  });
+
+  it("should not crash for stale analytics app config after integration removal", () => {
+    render(
+      <BookingPageTagManager
+        eventType={{
+          metadata: {
+            apps: {
+              //@ts-expect-error Testing stale removed analytics app config
+              gtm: {
+                enabled: true,
+                trackingId: "GTM-123",
+              },
+            },
+          },
+          price: 0,
+          currency: "USD",
+        }}
+      />
+    );
+    const scripts = screen.queryAllByTestId("cal-analytics-app-gtm");
     expect(scripts.length).toBe(0);
   });
 

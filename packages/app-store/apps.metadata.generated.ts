@@ -11,38 +11,30 @@ import { metadata as caldavcalendar__metadata_ts } from "./caldavcalendar/_metad
 import campfire_config_json from "./campfire/config.json";
 import closecom_config_json from "./closecom/config.json";
 import { metadata as dailyvideo__metadata_ts } from "./dailyvideo/_metadata";
-import databuddy_config_json from "./databuddy/config.json";
 import demodesk_config_json from "./demodesk/config.json";
 import dialpad_config_json from "./dialpad/config.json";
 import discord_config_json from "./discord/config.json";
-import dub_config_json from "./dub/config.json";
 import eightxeight_config_json from "./eightxeight/config.json";
 import element_call_config_json from "./element-call/config.json";
 import { metadata as exchange2013calendar__metadata_ts } from "./exchange2013calendar/_metadata";
 import { metadata as exchange2016calendar__metadata_ts } from "./exchange2016calendar/_metadata";
 import exchangecalendar_config_json from "./exchangecalendar/config.json";
 import facetime_config_json from "./facetime/config.json";
-import fathom_config_json from "./fathom/config.json";
 import { metadata as feishucalendar__metadata_ts } from "./feishucalendar/_metadata";
-import ga4_config_json from "./ga4/config.json";
 import { metadata as giphy__metadata_ts } from "./giphy/_metadata";
 import { metadata as googlecalendar__metadata_ts } from "./googlecalendar/_metadata";
 import { metadata as googlevideo__metadata_ts } from "./googlevideo/_metadata";
-import gtm_config_json from "./gtm/config.json";
 import hitpay_config_json from "./hitpay/config.json";
 import horizon_workrooms_config_json from "./horizon-workrooms/config.json";
 import { metadata as hubspot__metadata_ts } from "./hubspot/_metadata";
 import { metadata as huddle01video__metadata_ts } from "./huddle01video/_metadata";
 import ics_feedcalendar_config_json from "./ics-feedcalendar/config.json";
-import insihts_config_json from "./insihts/config.json";
 import intercom_config_json from "./intercom/config.json";
 import jelly_config_json from "./jelly/config.json";
 import { metadata as jitsivideo__metadata_ts } from "./jitsivideo/_metadata";
 import { metadata as larkcalendar__metadata_ts } from "./larkcalendar/_metadata";
 import lyra_config_json from "./lyra/config.json";
 import make_config_json from "./make/config.json";
-import matomo_config_json from "./matomo/config.json";
-import metapixel_config_json from "./metapixel/config.json";
 import mirotalk_config_json from "./mirotalk/config.json";
 import mock_payment_app_config_json from "./mock-payment-app/config.json";
 import nextcloudtalk_config_json from "./nextcloudtalk/config.json";
@@ -51,8 +43,6 @@ import office365video_config_json from "./office365video/config.json";
 import paypal_config_json from "./paypal/config.json";
 import ping_config_json from "./ping/config.json";
 import pipedrive_crm_config_json from "./pipedrive-crm/config.json";
-import plausible_config_json from "./plausible/config.json";
-import posthog_config_json from "./posthog/config.json";
 import qr_code_config_json from "./qr_code/config.json";
 import riverside_config_json from "./riverside/config.json";
 import roam_config_json from "./roam/config.json";
@@ -68,13 +58,10 @@ import sylapsvideo_config_json from "./sylapsvideo/config.json";
 import { metadata as tandemvideo__metadata_ts } from "./tandemvideo/_metadata";
 import telegram_config_json from "./telegram/config.json";
 import basic_config_json from "./templates/basic/config.json";
-import booking_pages_tag_config_json from "./templates/booking-pages-tag/config.json";
 import event_type_app_card_config_json from "./templates/event-type-app-card/config.json";
 import event_type_location_video_static_config_json from "./templates/event-type-location-video-static/config.json";
 import general_app_settings_config_json from "./templates/general-app-settings/config.json";
 import link_as_an_app_config_json from "./templates/link-as-an-app/config.json";
-import twipla_config_json from "./twipla/config.json";
-import umami_config_json from "./umami/config.json";
 import { metadata as vital__metadata_ts } from "./vital/_metadata";
 import weather_in_your_calendar_config_json from "./weather_in_your_calendar/config.json";
 import webex_config_json from "./webex/config.json";
@@ -96,38 +83,30 @@ export const appStoreMetadata = {
   campfire: campfire_config_json,
   closecom: closecom_config_json,
   dailyvideo: dailyvideo__metadata_ts,
-  databuddy: databuddy_config_json,
   demodesk: demodesk_config_json,
   dialpad: dialpad_config_json,
   discord: discord_config_json,
-  dub: dub_config_json,
   eightxeight: eightxeight_config_json,
   "element-call": element_call_config_json,
   exchange2013calendar: exchange2013calendar__metadata_ts,
   exchange2016calendar: exchange2016calendar__metadata_ts,
   exchangecalendar: exchangecalendar_config_json,
   facetime: facetime_config_json,
-  fathom: fathom_config_json,
   feishucalendar: feishucalendar__metadata_ts,
-  ga4: ga4_config_json,
   giphy: giphy__metadata_ts,
   googlecalendar: googlecalendar__metadata_ts,
   googlevideo: googlevideo__metadata_ts,
-  gtm: gtm_config_json,
   hitpay: hitpay_config_json,
   "horizon-workrooms": horizon_workrooms_config_json,
   hubspot: hubspot__metadata_ts,
   huddle01video: huddle01video__metadata_ts,
   "ics-feedcalendar": ics_feedcalendar_config_json,
-  insihts: insihts_config_json,
   intercom: intercom_config_json,
   jelly: jelly_config_json,
   jitsivideo: jitsivideo__metadata_ts,
   larkcalendar: larkcalendar__metadata_ts,
   lyra: lyra_config_json,
   make: make_config_json,
-  matomo: matomo_config_json,
-  metapixel: metapixel_config_json,
   mirotalk: mirotalk_config_json,
   "mock-payment-app": mock_payment_app_config_json,
   nextcloudtalk: nextcloudtalk_config_json,
@@ -136,8 +115,6 @@ export const appStoreMetadata = {
   paypal: paypal_config_json,
   ping: ping_config_json,
   "pipedrive-crm": pipedrive_crm_config_json,
-  plausible: plausible_config_json,
-  posthog: posthog_config_json,
   qr_code: qr_code_config_json,
   riverside: riverside_config_json,
   roam: roam_config_json,
@@ -153,13 +130,10 @@ export const appStoreMetadata = {
   tandemvideo: tandemvideo__metadata_ts,
   telegram: telegram_config_json,
   basic: basic_config_json,
-  "booking-pages-tag": booking_pages_tag_config_json,
   "event-type-app-card": event_type_app_card_config_json,
   "event-type-location-video-static": event_type_location_video_static_config_json,
   "general-app-settings": general_app_settings_config_json,
   "link-as-an-app": link_as_an_app_config_json,
-  twipla: twipla_config_json,
-  umami: umami_config_json,
   vital: vital__metadata_ts,
   weather_in_your_calendar: weather_in_your_calendar_config_json,
   webex: webex_config_json,

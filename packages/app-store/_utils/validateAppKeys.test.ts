@@ -149,18 +149,13 @@ describe("shouldEnableApp", () => {
       expect(result).toBe(true);
     });
 
-    it("should return true for GTM when keys are null", () => {
-      const result = shouldEnableApp("gtm", null);
+    it("should return true for unknown app when keys are null", () => {
+      const result = shouldEnableApp("unknown-app-without-keys-schema", null);
       expect(result).toBe(true);
     });
 
-    it("should return true for GTM when keys are undefined", () => {
-      const result = shouldEnableApp("gtm", undefined);
-      expect(result).toBe(true);
-    });
-
-    it("should return true for GA4 when keys are null", () => {
-      const result = shouldEnableApp("ga4", null);
+    it("should return true for unknown app when keys are undefined", () => {
+      const result = shouldEnableApp("unknown-app-without-keys-schema", undefined);
       expect(result).toBe(true);
     });
   });

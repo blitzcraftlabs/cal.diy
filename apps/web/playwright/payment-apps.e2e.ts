@@ -248,30 +248,24 @@ test.describe("Payment app", () => {
    * this can change in the future
    */
   test("Should not display App is not setup already for non payment app", async ({ page, users }) => {
-    // We will use google analytics app for this test
     const user = await users.create();
     await user.apiLogin();
-    // Any event should work here
     const paymentEvent = user.eventTypes.find((item) => item.slug === "paid");
     expect(paymentEvent).not.toBeNull();
 
     await prisma.credential.create({
       data: {
-        type: "ga4_analytics",
+        type: "giphy_other",
         userId: user.id,
-        appId: "ga4",
+        appId: "giphy",
         invalid: false,
-        key: {},
+        key: { app_key: "test-key" },
       },
     });
 
     await goToAppsTab(page, paymentEvent?.id);
 
     await page.locator("#event-type-form").getByRole("switch").click();
-    // make sure Tracking ID is displayed
-    await expect(page.locator("text=Tracking ID").first()).toBeVisible();
-    await page.getByLabel("Tracking ID").click();
-    await page.getByLabel("Tracking ID").fill("demo");
     await page.getByTestId("update-eventtype").click();
   });
 
