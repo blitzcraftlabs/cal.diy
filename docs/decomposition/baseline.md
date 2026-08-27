@@ -103,19 +103,19 @@ Manual smoke test (partial on this host): login, event types, availability, sett
 
 ## Phase 2 metrics (redirect-only app-store purge)
 
-Measured 2026-08-26 from `/home/danielmark/Projects/cal.diy` immediately before and after deleting 28 verified redirect-only integrations (Zapier retained).
+Measured 2026-08-27 from clean Git revisions via detached worktrees (`git worktree add` at base `25a3ccdfc5` and head `c59862a923`). Commands run identically in each worktree root; no dirty working-tree files included.
 
 | Metric | Before Phase 2 | After Phase 2 | Delta | How measured | Notes |
 |--------|----------------|---------------|-------|--------------|-------|
 | Yarn workspace count | 114 | 112 | −2 | `yarn workspaces list \| wc -l` | Removed `@calcom/linear`, `@calcom/famulor` workspaces |
-| TS/TSX source files | 5,788 | 5,781 | −7 | `find . -type f \( -name '*.ts' -o -name '*.tsx' \) -not -path '*/node_modules/*' -not -path '*/.next/*' -not -path '*/dist/*' -not -path '*/.turbo/*' \| wc -l` | Includes other in-flight local changes |
+| TS/TSX source files | 5,017 | 5,010 | −7 | `find . -type f \( -name '*.ts' -o -name '*.tsx' \) -not -path '*/node_modules/*' -not -path '*/.next/*' -not -path '*/dist/*' -not -path '*/.turbo/*' \| wc -l` | Matches `git ls-tree` tracked count at each revision |
 | App-store integration dirs | 113 | 85 | −28 | `find packages/app-store -maxdepth 1 -mindepth 1 -type d \| wc -l` | 28 redirect-only app directories removed |
 | `packages/app-store` file count | 1,567 | 1,371 | −196 | `find packages/app-store -type f -not -path '*/node_modules/*' \| wc -l` | Mostly static assets + config |
-| `packages/app-store` size | 156M | 139M | −17M | `du -sh packages/app-store` | |
-| Generated metadata import count | 93 | 65 | −28 | `rg -c 'import .*(_config_json\|_metadata_ts)' packages/app-store/apps.metadata.generated.ts` | One fewer entry per removed integration |
-| Source-only repo size | 1.2G | 1.2G | 0 | `du -sh --exclude='.git' --exclude='node_modules' --exclude='.next' --exclude='dist' --exclude='.turbo' .` | Unchanged at this granularity |
-| Web dependency graph workspaces | 21 | 21 | 0 | Recursive `workspace:` dependency walk from `apps/web/package.json` | Unchanged; deleted apps were not in web dependency graph |
-| Type-check duration (`@calcom/web` + `@calcom/app-store`) | Not measured (pre-change) | 126.4s | — | `yarn turbo run type-check:ci --filter=@calcom/web --filter=@calcom/app-store --force` | exit 0 |
+| `packages/app-store` size | 155M | 137M | −18M | `du -sh packages/app-store` | |
+| Generated metadata import count | 112 | 84 | −28 | `rg 'import ' packages/app-store/apps.metadata.generated.ts \| wc -l` | One fewer entry per removed integration |
+| Source-only repo size | 217M | 200M | −17M | `du -sh --exclude='.git' --exclude='node_modules' --exclude='.next' --exclude='dist' --exclude='.turbo' .` | Measured in clean worktrees (no local build artifacts) |
+| Web dependency graph workspaces | 25 | 25 | 0 | Recursive `workspace:` dependency walk from `apps/web/package.json` (all `package.json` dirs indexed; follows `dependencies` + `devDependencies`) | Phase 1 absolute count (21) not reproducible from documented command alone; reproducible walk unchanged across Phase 2 |
+| Type-check duration (`@calcom/web` + `@calcom/app-store`) | Not measured (pre-change) | 86.2s | — | `yarn turbo run type-check:ci --filter=@calcom/web --filter=@calcom/app-store --force` | exit 0 (corrective pass 2026-08-27) |
 | Redirect-only integrations deleted | — | 28 | — | Manual audit + `externalLink` config scan | Zapier deferred (active webhook/subscription runtime) |
 
 ## Phase 2 removals
@@ -124,7 +124,9 @@ Measured 2026-08-26 from `/home/danielmark/Projects/cal.diy` immediately before 
 
 `amie`, `autocheckin`, `baa-for-hipaa`, `bolna`, `caretta`, `chatbase`, `clara`, `clic`, `cron`, `deel`, `elevenlabs`, `famulor`, `fonio-ai`, `framer`, `granola`, `greetmate-ai`, `lindy`, `linear`, `millis-ai`, `monobot`, `n8n`, `pipedream`, `raycast`, `retell-ai`, `synthflow`, `telli`, `vimcal`, `wordpress`
 
-Each contained only marketplace metadata (`config.json`, `DESCRIPTION.md`, static assets). `linear` and `famulor` had declarative redirect `api/add.ts` stubs (install + external URL) unused by `isRedirectApp` UI flow. `wordpress` had template `zod.ts` scaffolding only.
+Each contained only marketplace metadata (`config.json`, `DESCRIPTION.md`, static assets) plus redirect install stubs where noted. `linear` and `famulor` had declarative redirect `api/add.ts` stubs (install + external URL) unused by `isRedirectApp` UI flow.
+
+**`wordpress` audit:** The app-store entry was `externalLink`-only (marketplace link to wordpress.org/plugins/cal-com/). The directory also contained legacy WordPress plugin source (`plugin.php` implementing a `[cal]` shortcode with inlined embed snippet). Repository-wide search at Phase 2 base (`25a3ccdfc5`) found no build, packaging, publish, CI, app-store-cli, or static-copy tooling that consumed `plugin.php`; references were limited to generated metadata, a sync comment in `packages/embeds/embed-snippet/src/index.ts`, and an unrelated embed-param comment in `bookingSuccessRedirect.ts`. The published WordPress plugin lives on wordpress.org, not in this repo's build output. Safe to remove in Phase 2.
 
 ### Deferred from redirect set
 
@@ -144,11 +146,13 @@ Each contained only marketplace metadata (`config.json`, `DESCRIPTION.md`, stati
 
 ## Validation (Phase 2)
 
+Measured 2026-08-27 (corrective pass).
+
 ```bash
 yarn app-store:build  # exit 0
 yarn install  # exit 0
 yarn env-check:app-store  # exit 0
-yarn turbo run type-check:ci --filter=@calcom/web --filter=@calcom/app-store --force  # exit 0, 126.4s
+yarn turbo run type-check:ci --filter=@calcom/web --filter=@calcom/app-store --force  # exit 0, 86.2s
 TZ=UTC yarn test packages/features/bookings/lib/handleNewBooking/test/per-host-locations.test.ts packages/features/availability packages/ui/components/badge/CreditsBadge.test.tsx packages/app-store/_utils/getAppCategories.test.ts packages/app-store/utils.test.ts  # 68/68 passed
 ```
 
