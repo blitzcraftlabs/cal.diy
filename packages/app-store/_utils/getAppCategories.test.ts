@@ -15,4 +15,9 @@ describe("getAppCategories", () => {
         expect(missingInEntries).toHaveLength(0)
         expect(missingInOrder).toHaveLength(0)
     })
+
+    it("should not expose the removed analytics category", () => {
+        expect(APP_CATEGORY_ENTRIES).not.toHaveProperty("analytics")
+        expect(CATEGORY_ORDER).not.toContain("analytics")
+    })
 })

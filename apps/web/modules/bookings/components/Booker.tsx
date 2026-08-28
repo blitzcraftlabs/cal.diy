@@ -333,7 +333,7 @@ const BookerComponent = ({
 
   return (
     <>
-      {event.data && !isPlatform ? <BookingPageTagManager eventType={event.data} /> : <></>}
+      {event.data && !isPlatform ? <BookingPageTagManager /> : <></>}
       {(isBookingDryRunProp || isBookingDryRun(searchParams)) && <DryRunMessage isEmbed={isEmbed} />}
       <div
         className={classNames(

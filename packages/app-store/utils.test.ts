@@ -3,8 +3,55 @@ import { describe, it, expect } from "vitest";
 import type { App } from "@calcom/types/App";
 import type { CredentialForCalendarService } from "@calcom/types/Credential";
 
-import { sanitizeAppForViewer } from "./utils";
+import getApps, { sanitizeAppForViewer } from "./utils";
 import type { CredentialDataWithTeamName, LocationOption } from "./utils";
+
+const REMOVED_ANALYTICS_APP_IDS = ["gtm", "ga4", "dub", "posthog"] as const;
+
+function createStaleCredential(appId: string): CredentialDataWithTeamName {
+  return {
+    id: 99,
+    type: `${appId}_analytics`,
+    key: { api_key: "stale" },
+    userId: 1,
+    user: { email: "test@example.com" },
+    teamId: null,
+    appId,
+    invalid: false,
+    delegatedTo: null,
+    delegatedToId: null,
+    delegationCredentialId: null,
+    team: null,
+    encryptedKey: null,
+  };
+}
+
+describe("getApps with stale removed-app credentials", () => {
+  it("should ignore stale credentials for deleted analytics apps without crashing", () => {
+    const credentials = REMOVED_ANALYTICS_APP_IDS.map(createStaleCredential);
+
+    expect(() => getApps(credentials, true)).not.toThrow();
+
+    const installedApps = getApps(credentials, true);
+    for (const appId of REMOVED_ANALYTICS_APP_IDS) {
+      expect(installedApps.find((app) => app.slug === appId)).toBeUndefined();
+    }
+  });
+
+  it("should not attach stale credentials to any returned app", () => {
+    const credentials = REMOVED_ANALYTICS_APP_IDS.map(createStaleCredential);
+    const apps = getApps(credentials, false);
+
+    for (const app of apps) {
+      const removedAppIds = new Set<string>(REMOVED_ANALYTICS_APP_IDS);
+      expect(
+        app.credentials.every(
+          (credential) => credential.appId === null || !removedAppIds.has(credential.appId)
+        )
+      ).toBe(true);
+    }
+  });
+});
 
 describe("sanitizeAppForViewer", () => {
   it("should remove key, credential, and credentials properties", () => {

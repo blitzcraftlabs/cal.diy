@@ -156,11 +156,106 @@ yarn turbo run type-check:ci --filter=@calcom/web --filter=@calcom/app-store --f
 TZ=UTC yarn test packages/features/bookings/lib/handleNewBooking/test/per-host-locations.test.ts packages/features/availability packages/ui/components/badge/CreditsBadge.test.tsx packages/app-store/_utils/getAppCategories.test.ts packages/app-store/utils.test.ts  # 68/68 passed
 ```
 
-## Next phase readiness
+## Next phase readiness (post-Phase 2)
 
-Repository is ready for **Phase 3 — analytics and marketing integration purge**, with these prerequisites noted:
+Repository was ready for **Phase 3 — analytics and marketing integration purge**, with these prerequisites noted:
 
 1. Zapier remains the sole `REDIRECT_APPS` entry because it has active automation webhook APIs despite `externalLink` metadata.
-2. Analytics integrations (`ga4`, `gtm`, `fathom`, `plausible`, `posthog`, `metapixel`, `matomo`, `umami`, `databuddy`, `insihts`, `twipla`) and CRM/payment/calendar/video integrations were intentionally preserved.
+2. Analytics integrations (`ga4`, `gtm`, `fathom`, `plausible`, `posthog`, `metapixel`, `matomo`, `umami`, `databuddy`, `insihts`, `twipla`, `dub`) were targeted for Phase 3 removal; CRM/payment/calendar/video integrations were intentionally preserved.
 3. Run full `yarn type-check:ci --force` in CI before merge (local scoped check passed).
 4. Static conferencing integrations (e.g. `facetime`, `skype`, `horizon-workrooms`) need explicit runtime audit before any Phase 3+ video pruning.
+
+## Phase 3 metrics (analytics/marketing app-store purge)
+
+Measured 2026-08-27 from clean Git revisions via detached worktrees at base `e4fc69994b4b7e47fe47164cc6b47e5689c257f6` (Phase 2 corrective HEAD) and head `6a30a58c418a83d35e4c268e174404acd8ea5163` (Phase 3 PR final head). Commands run identically in each worktree root; no dirty working-tree files included.
+
+```bash
+# Create clean worktrees
+git worktree add /tmp/cal-decomp-metrics-phase3/base e4fc69994b4b7e47fe47164cc6b47e5689c257f6
+git worktree add /tmp/cal-decomp-metrics-phase3/head 6a30a58c418a83d35e4c268e174404acd8ea5163
+
+# Run in each worktree root:
+yarn workspaces list | wc -l
+find . -type f \( -name '*.ts' -o -name '*.tsx' \) -not -path '*/node_modules/*' -not -path '*/.next/*' -not -path '*/dist/*' -not -path '*/.turbo/*' | wc -l
+find packages/app-store -maxdepth 1 -mindepth 1 -type d | wc -l
+find packages/app-store -type f -not -path '*/node_modules/*' | wc -l
+du -sh packages/app-store
+rg 'import ' packages/app-store/apps.metadata.generated.ts | wc -l
+du -sh --exclude='.git' --exclude='node_modules' --exclude='.next' --exclude='dist' --exclude='.turbo' .
+# Web dependency graph: recursive workspace: dependency walk from apps/web/package.json
+node -e "const fs=require('fs');const path=require('path');const packages=new Map();function walk(dir){for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const full=path.join(dir,entry.name);if(['node_modules','.git','.next','dist','.turbo'].includes(entry.name))continue;if(entry.isDirectory())walk(full);else if(entry.name==='package.json'){try{const pkg=JSON.parse(fs.readFileSync(full,'utf8'));if(pkg.name)packages.set(pkg.name,pkg);}catch{}}}}walk('.');function workspaceDeps(pkg){const deps={...pkg.dependencies,...pkg.devDependencies};return Object.entries(deps).filter(([,v])=>typeof v==='string'&&v.startsWith('workspace:')).map(([n])=>n);}const visited=new Set();const queue=['@calcom/web'];while(queue.length){const name=queue.shift();if(visited.has(name))continue;visited.add(name);const pkg=packages.get(name);if(!pkg)continue;for(const dep of workspaceDeps(pkg))if(!visited.has(dep))queue.push(dep);}console.log(visited.size);"
+```
+
+| Metric | Before Phase 3 | After Phase 3 | Delta | How measured | Notes |
+|--------|----------------|---------------|-------|--------------|-------|
+| Yarn workspace count | 112 | 100 | −12 | `yarn workspaces list \| wc -l` | Removed 12 analytics integration workspaces |
+| TS/TSX source files | 5,010 | 4,930 | −80 | `find . -type f \( -name '*.ts' -o -name '*.tsx' \) -not -path '*/node_modules/*' -not -path '*/.next/*' -not -path '*/dist/*' -not -path '*/.turbo/*' \| wc -l` | Direct count at each clean revision |
+| App-store integration dirs | 85 | 73 | −12 | `find packages/app-store -maxdepth 1 -mindepth 1 -type d \| wc -l` | |
+| `packages/app-store` file count | 1,371 | 1,216 | −155 | `find packages/app-store -type f -not -path '*/node_modules/*' \| wc -l` | |
+| `packages/app-store` size | 137M | 128M | −9M | `du -sh packages/app-store` | |
+| Generated metadata import count | 84 | 71 | −13 | `rg 'import ' packages/app-store/apps.metadata.generated.ts \| wc -l` | 12 integrations + `booking-pages-tag` template |
+| Source-only repo size | 200M | 191M | −9M | `du -sh --exclude='.git' --exclude='node_modules' --exclude='.next' --exclude='dist' --exclude='.turbo' .` | Clean worktrees only |
+| Web dependency graph workspaces | 25 | 25 | 0 | Recursive `workspace:` dependency walk from `apps/web/package.json` | Unchanged across Phase 3 |
+| Analytics integrations removed | — | 12 | — | Manual audit of `variant: analytics` integrations | Plus `templates/booking-pages-tag` demo template |
+
+## Phase 3 removals
+
+### Deleted analytics/marketing integrations (12)
+
+`ga4`, `gtm`, `fathom`, `plausible`, `posthog`, `metapixel`, `matomo`, `umami`, `databuddy`, `insihts`, `twipla`, `dub`
+
+Each provided customer-configured booking-page script injection (`appData.tag`) and/or event-type app configuration. `dub` additionally exposed OAuth install + server-side lead tracking via tasker (`handleAnalyticsEvents`); first-party `@dub/analytics` / `dub` SDK usage in signup/auth/referrals was preserved.
+
+### Deleted template
+
+- `packages/app-store/templates/booking-pages-tag` — CLI demo template for analytics tag apps
+
+### Deleted shared analytics execution path (proven unused after integration removal)
+
+- `packages/app-store/_utils/getAnalytics.ts` — loaded `AnalyticsServiceMap`; only consumer was tasker `AnalyticsManager`
+- `packages/features/tasker/tasks/analytics/*` — removed analytics task producer/handler pipeline for app-store Dub lead events
+- `packages/features/tasker/tasks/sendAnalyticsEvent.ts` — legacy tombstone handler retained to drain persisted pre-Phase-3 `sendAnalyticsEvent` tasks as a no-op (no new producers)
+- `packages/types/AnalyticsService.d.ts` — type surface for deleted `AnalyticsService` implementations
+- `handleAnalyticsEvents` call + `dub_id` booking body field — only used for deleted Dub app-store integration
+- `BookingPageTagManager` analytics script injection (`next/script`, `cal_analytics_app_*` globals, `appData.tag` scanning) — removed in corrective pass; component now only registers SDK event forwarding to `window.opener`
+
+### Preserved shared infrastructure
+
+- `BookingPageTagManager` — still imported on Booker/booking-success to register module-level `sdkActionManager` listener; `handleEvent` forwards non-internal SDK events to `window.opener` (rerouting/rescheduling).
+- `getEventTypeAppData` — generic; stale `metadata.apps.{removedSlug}` keys are ignored (no matching `appStoreMetadata` entry).
+- Stale `Credential` rows whose `appId` references a removed integration (e.g. `gtm`, `ga4`, `dub`, `posthog`) may remain in the database; `getApps` / connected-app resolution ignores them because the slug no longer exists in `appStoreMetadata`. No migration deletes these rows in Phase 3.
+- `appData.tag` on `AppMeta` / `AppMetaSchema` — retained as generic app-store type surface for generator/templates; no integrations currently populate it.
+- `analytics` app-store category removed from `getAppCategories` navigation surface (no integrations remain in that category).
+- First-party telemetry: `posthog-js` product analytics, `@dub/analytics` signup attribution, `@calcom/lib/gtm` signup GTM, Sentry/Axiom/logging unchanged.
+- First-party `dub` SDK in `@calcom/feature-auth` — preserved at `0.61.14` (previously resolved via app-store `dub-package` alias `npm:dub@^0.61.12` → `0.61.14`); direct import after app-store workspace deletion.
+
+### Regenerated artifacts
+
+`yarn app-store:build` regenerated all generated registries. `analytics.services.generated.ts` remains in the generator contract (`packages/app-store-cli/src/build.ts` `filesToGenerate`) and outputs an empty `AnalyticsServiceMap` when no integrations define `lib/AnalyticsService.ts`; left in place to avoid generator redesign in this pass.
+
+## Scheduling kernel (Phase 3)
+
+**Scheduling kernel behavior modified: NO.** `RegularBookingService` was touched only to remove the deleted Dub post-booking analytics side effect (`handleAnalyticsEvents` import and call).
+
+**Prisma schema modified: NO**
+
+**Prisma migrations modified: NO**
+
+## Validation (Phase 3)
+
+Measured 2026-08-27 (final corrective pass at head `6a30a58c418a83d35e4c268e174404acd8ea5163`).
+
+```bash
+yarn app-store:build  # exit 0
+yarn env-check:app-store  # exit 0
+yarn turbo run type-check:ci --filter=@calcom/web --filter=@calcom/app-store --force  # exit 0, ~300s
+TZ=UTC yarn test packages/app-store/BookingPageTagManager.test.tsx packages/app-store/_utils/getAppCategories.test.ts packages/app-store/_utils/validateAppKeys.test.ts packages/app-store/utils.test.ts packages/features/bookings/lib/handleNewBooking/test/per-host-locations.test.ts packages/features/availability packages/features/tasker/tasks/sendAnalyticsEvent.test.ts  # 99/99 passed
+```
+
+## Next phase readiness (post-Phase 3)
+
+Repository is ready for **Phase 4 — CRM integration removal**, with these prerequisites noted:
+
+1. CRM integrations remain: `hubspot`, `salesforce`, `pipedrive-crm`, `closecom`, `attio`, `zoho-bigin`, `zohocrm` (audit each before deletion).
+2. Zapier still deferred (active webhook runtime despite `externalLink` metadata).
+3. Run full `yarn type-check:ci --force` in CI before merge.

@@ -59,7 +59,6 @@ export const mapBookingToMutationInput = ({
   const routedTeamMemberIds = getRoutedTeamMemberIdsFromSearchParams(searchParams);
   const skipContactOwner = searchParams.get("cal.skipContactOwner") === "true";
   const _isDryRun = isDryRunProp !== undefined ? isDryRunProp : isBookingDryRun(searchParams);
-  const dub_id = searchParams?.get("dub_id");
 
   return {
     ...values,
@@ -89,7 +88,6 @@ export const mapBookingToMutationInput = ({
     rrHostSubsetIds,
     skipContactOwner,
     _isDryRun,
-    dub_id,
     verificationCode,
   };
 };
